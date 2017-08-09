@@ -1,0 +1,5 @@
+<div class="jumbotron">
+  <h2><%= gettext "Welcome %{name}", name: "aweful!" %></h2>
+  <h4>The Elementary MBA Budget App</h4>
+  <p class="lead">My Habits<br />My Pleasure.</p>
+</div>
