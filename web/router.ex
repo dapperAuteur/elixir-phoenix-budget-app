@@ -22,6 +22,12 @@ defmodule Budget.Router do
     resources "/sessions", SessionController, only: [:new, :create, :delete]
   end
 
+  scope "/manage", Budget do
+    pipe_through [:browser, :authenticate_user]
+
+    resources "/transactions", TransactionController
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", Budget do
   #   pipe_through :api

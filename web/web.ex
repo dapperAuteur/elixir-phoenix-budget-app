@@ -32,10 +32,11 @@ defmodule Budget.Web do
 
       alias Budget.Repo
       import Ecto
-      import Ecto.Query
+      import Ecto.Query, only: [from: 1, from: 2]
 
       import Budget.Router.Helpers
       import Budget.Gettext
+      import Budget.Auth, only: [authenticate_user: 2] # New import
     end
   end
 
@@ -58,6 +59,8 @@ defmodule Budget.Web do
   def router do
     quote do
       use Phoenix.Router
+
+      import Budget.Auth, only: [authenticate_user: 2] # New import
     end
   end
 
