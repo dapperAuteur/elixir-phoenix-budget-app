@@ -9,7 +9,11 @@ defmodule Budget.TransactionController do
   end
 
   def new(conn, _params) do
-    changeset = Transaction.changeset(%Transaction{})
+    changeset =
+      conn.assigns.current_user
+      |> build_assoc(:transactions)
+      |> Transaction.changeset()
+
     render(conn, "new.html", changeset: changeset)
   end
 
@@ -61,5 +65,10 @@ defmodule Budget.TransactionController do
     conn
     |> put_flash(:info, "Transaction deleted successfully.")
     |> redirect(to: transaction_path(conn, :index))
+  end
+
+  def action(conn, _) do
+    apply(__MODULE__, action_name(conn),
+          [conn, conn.params, conn.assigns.current_user])
   end
 end
