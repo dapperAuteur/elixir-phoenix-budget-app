@@ -3,22 +3,25 @@ defmodule Budget.TransactionController do
 
   alias Budget.Transaction
 
-  def index(conn, _params) do
-    transactions = Repo.all(Transaction)
+  def index(conn, _params, user) do
+    transactions = Repo.all(user_transactions(user))
     render(conn, "index.html", transactions: transactions)
   end
 
-  def new(conn, _params) do
+  def new(conn, _params, user) do
     changeset =
-      conn.assigns.current_user
+      user
       |> build_assoc(:transactions)
       |> Transaction.changeset()
 
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"transaction" => transaction_params}) do
-    changeset = Transaction.changeset(%Transaction{}, transaction_params)
+  def create(conn, %{"transaction" => transaction_params}, user) do
+    changeset =
+      user
+      |> build_assoc(:transactions)
+      |> Transaction.changeset(transaction_params)
 
     case Repo.insert(changeset) do
       {:ok, _transaction} ->
@@ -30,19 +33,19 @@ defmodule Budget.TransactionController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    transaction = Repo.get!(Transaction, id)
+  def show(conn, %{"id" => id}, user) do
+    transaction = Repo.get!(user_transactions(user), id)
     render(conn, "show.html", transaction: transaction)
   end
 
-  def edit(conn, %{"id" => id}) do
-    transaction = Repo.get!(Transaction, id)
+  def edit(conn, %{"id" => id}, user) do
+    transaction = Repo.get!(user_transactions(user), id)
     changeset = Transaction.changeset(transaction)
     render(conn, "edit.html", transaction: transaction, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "transaction" => transaction_params}) do
-    transaction = Repo.get!(Transaction, id)
+  def update(conn, %{"id" => id, "transaction" => transaction_params}, user) do
+    transaction = Repo.get!(user_transactions(user), id)
     changeset = Transaction.changeset(transaction, transaction_params)
 
     case Repo.update(changeset) do
@@ -55,8 +58,8 @@ defmodule Budget.TransactionController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    transaction = Repo.get!(Transaction, id)
+  def delete(conn, %{"id" => id}, user) do
+    transaction = Repo.get!(user_transactions(user), id)
 
     # Here we use delete! (with a bang) because we expect
     # it to always work (and if it does not, it will raise).
@@ -70,5 +73,9 @@ defmodule Budget.TransactionController do
   def action(conn, _) do
     apply(__MODULE__, action_name(conn),
           [conn, conn.params, conn.assigns.current_user])
+  end
+
+  defp user_transactions(user) do
+    assoc(user, :transactions)
   end
 end
