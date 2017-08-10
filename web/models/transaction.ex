@@ -17,9 +17,12 @@ defmodule Budget.Transaction do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
-  def changeset(struct, params \\ %{}) do
-    struct
-    |> cast(params, [:vendor, :amount, :balance, :credit, :debit, :transfer, :description])
+  @required_fields ~w(vendor amount description)
+  @optional_fields ~w()
+
+  def changeset(model, params \\ :empty) do
+    model
+    |> cast(params, @required_fields, @optional_fields)
     |> validate_required([:vendor, :amount, :balance, :credit, :debit, :transfer, :description])
   end
 end
